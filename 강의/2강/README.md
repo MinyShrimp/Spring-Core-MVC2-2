@@ -124,6 +124,81 @@ public class FormItemController {
 ![img_1.png](img_1.png)
 
 ## 요구사항 추가
+타임리프를 사용해서 폼에서 체크박스, 라디오 버튼, 셀렉트 박스를 편리하게 사용하는 방법을 학습해보자.
+기존 상품 서비스에 다음 요구사항이 추가되었다.
+
+* 판매 여부
+  * 판매 오픈 여부
+  * 체크 박스로 선택할 수 있다.
+* 등록 지역
+  * 서울, 부산, 제주
+  * 체크 박스로 다중 선택할 수 있다.
+* 상품 종류
+  * 도서, 식품, 기타
+  * 라디오 버튼으로 하나만 선택할 수 있다.
+* 배송 방식
+  * 빠른 배송
+  * 일반 배송
+  * 느린 배송
+  * 셀렉트 박스로 하나만 선택할 수 있다.
+
+### ItemType - 상품 종류
+```java
+public enum ItemType {
+    BOOK("도서"), FOOD("음식"), ETC("기타");
+
+    private final String description;
+
+    ItemType(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+}
+```
+상품 종류는 ENUM 을 사용한다. 설명을 위해 description 필드를 추가했다.
+
+### DeliveryCode - 배송 방식
+```java
+@Getter @Setter
+@AllArgsConstructor
+public class DeliveryCode {
+    private String code;
+    private String displayName;
+}
+```
+배송 방식은 DeliveryCode 클래스를 사용한다. 
+`code`는 `FAST`같이 시스템에서 전달하는 값이고, 
+`displayName`은 `빠른 배송`같이 고객에게 보여주는 값이다.
+
+### Item - 상품
+```java
+@Getter @Setter
+public class Item {
+    private Long id;
+    private String itemName;
+    private Integer price;
+    private Integer quantity;
+
+    private Boolean open;           // 판매 여부
+    private List<String> regions;   // 등록 지역
+    private ItemType itemType;      // 상품 종류
+    private String deliveryCode;    // 배송 방식
+
+    public Item() {}
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+
+ENUM, 클래스, String 같은 다양한 상황을 준비했다.
+각각의 상황에 어떻게 폼의 데이터를 받을 수 있는지 하나씩 알아보자.
 
 ## 체크 박스 - 단일 1
 
