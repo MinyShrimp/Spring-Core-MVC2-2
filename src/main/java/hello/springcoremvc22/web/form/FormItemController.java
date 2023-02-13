@@ -2,6 +2,7 @@ package hello.springcoremvc22.web.form;
 
 import hello.springcoremvc22.domain.item.Item;
 import hello.springcoremvc22.domain.item.ItemRepository;
+import hello.springcoremvc22.domain.item.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,11 @@ public class FormItemController {
         regions.put("BUSAN", "부산");
         regions.put("JEJU", "제주");
         return regions;
+    }
+
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+        return ItemType.values();
     }
 
     @GetMapping
@@ -58,6 +64,7 @@ public class FormItemController {
             RedirectAttributes redirectAttributes
     ) {
         log.info("item = {}", item.toString());
+        log.info("item.itemType = {}", item.getItemType());
 
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());

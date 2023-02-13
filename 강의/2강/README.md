@@ -461,6 +461,85 @@ item = Item(
 ![img_7.png](img_7.png)
 
 ## 라디오 버튼
+라디오 버튼은 여러 선택지 중에 하나를 선택할 때 사용할 수 있다.
+이번시간에는 라디오 버튼을 자바 ENUM을 활용해서 개발해보자.
+
+### FormItemController
+```java
+@Slf4j
+@Controller
+@RequestMapping("/form/items")
+@RequiredArgsConstructor
+public class FormItemController {
+  @ModelAttribute("itemTypes")
+  public ItemType[] itemTypes() {
+    return ItemType.values();
+  }
+}
+```
+
+### addForm.html
+```html
+<!-- Radio Button -->
+<div>
+    <div>상품 종류</div>
+    <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+        <input type="radio" th:field="*{itemType}" th:value="${type.name()}" class="form-check-input">
+        <label th:for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label"></label>
+    </div>
+</div>
+```
+
+### 결과
+![img_8.png](img_8.png)
+
+### 실행 로그
+```
+// 값이 없을 때
+item.itemType = null
+
+// 값이 있을 때
+item.itemType = FOOD
+```
+
+### 상세페이지 - item.html
+```html
+<!-- Radio Button -->
+<div>
+    <div>상품 종류</div>
+    <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+        <input type="radio" th:field="${item.itemType}" th:value="${type.name()}" class="form-check-input" disabled>
+        <label th:for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label"></label>
+    </div>
+</div>
+```
+
+### 상세페이지 결과
+![img_9.png](img_9.png)
+
+### 수정페이지 - editForm.html
+```html
+<!-- Radio Button -->
+<div>
+    <div>상품 종류</div>
+    <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+        <input type="radio" th:field="*{itemType}" th:value="${type.name()}" class="form-check-input">
+        <label for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label"></label>
+    </div>
+</div>
+```
+
+### 수정페이지 결과
+![img_10.png](img_10.png)
+
+### 타임리프에서 ENUM 직접 접근
+```html
+<div th:each="type : ${T(hello.springcoremvc22.domain.item.ItemType).values()}">
+```
+자바의 ENUM의 풀 패키지를 입력하면 스프링 EL을 이용해으로 ENUM을 직접 접근하여 사용할 수 있다.
+
+그런데, 이렇게 사용하면 ENUM의 패키지 위치가 변경되버리면 저 부분에서 인식이 안되며, 저렇게 작성한 모든 코드를 수정해줘야 한다.
+그런데 더 큰 문제는 이를 컴파일 단계에서 알아차릴 수 없고, 오직 런타임에서 발견할 수 있기 때문에 권장되는 방법이 아니다.
 
 ## 셀렉트 박스
 
