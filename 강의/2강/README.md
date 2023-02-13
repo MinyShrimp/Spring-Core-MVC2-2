@@ -286,6 +286,84 @@ item.open=false
 따라서 체크를 해제한 경우 여기에서 open 은 전송되지 않고, _open 만 전송되는데, 이 경우 스프링 MVC는 체크를 해제했다고 판단한다.
 
 ## 체크 박스 - 단일 2
+개발할 때 마다 이렇게 히든 필드를 추가하는 것은 상당히 번거롭다.
+타임리프가 제공하는 폼 기능을 사용하면 이런 부분을 자동으로 처리할 수 있다.
+
+### 타임리프 - 체크 박스 코드 추가
+```html
+<hr class="my-4">
+<!-- Single Checkbox -->
+<div>판매 여부</div>
+<div>
+    <div class="form-check">
+        <!-- 
+        <input type="checkbox" id="open" name="open" class="form-check-input">
+        히든 필드 추가
+        <input type="hidden" name="_open" value="on"> 
+        -->
+        <input type="checkbox" th:field="*{open}" class="form-check-input">
+        <label for="open" class="form-check-label">판매 오픈</label>
+    </div>
+</div>
+```
+
+### 결과
+![img_2.png](img_2.png)
+
+* `<input type="hidden" name="_open" value="on"/>` 
+* `th:field`를 사용하면 타임리프에서 히든 필드를 자동으로 생성해준다 !
+
+### 상품 상세 - item.html
+```html
+<hr class="my-4">
+<!-- Single Checkbox -->
+<div> 판매 여부 </div>
+<div>
+    <div class="form-check">
+        <input type="checkbox" th:field="${item.open}" disabled>
+        <label for="open" class="form-check-label">판매 오픈</label>
+    </div>
+</div>
+```
+
+### 상품 상세 결과
+![img_3.png](img_3.png)
+
+### 상품 수정 - editForm.html
+```html
+<hr class="my-4">
+<!-- Single Checkbox -->
+<div>판매 여부</div>
+<div>
+    <div class="form-check">
+        <input type="checkbox" th:field="*{open}" class="form-check-input">
+        <label for="open" class="form-check-label"> 판매 오픈 </label>
+    </div>
+</div>
+```
+
+### 상품 수정 - ItemRepository.update
+```java
+@Repository
+public class ItemRepository {
+    public void update(Long itemId, Item updateParam) {
+        Item findItem = findById(itemId);
+        findItem.setItemName(updateParam.getItemName());
+        findItem.setPrice(updateParam.getPrice());
+        findItem.setQuantity(updateParam.getQuantity());
+        
+        // 추가
+        findItem.setOpen(updateParam.getOpen());
+        findItem.setRegions(updateParam.getRegions());
+        findItem.setItemType(updateParam.getItemType());
+        findItem.setItemName(updateParam.getItemName());
+        findItem.setDeliveryCode(updateParam.getDeliveryCode());
+    }
+}
+```
+
+### 상품 수정 결과
+![img_4.png](img_4.png)
 
 ## 체크 박스 - 멀티
 

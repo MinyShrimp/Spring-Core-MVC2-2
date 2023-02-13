@@ -46,9 +46,6 @@ public class FormItemController {
             @ModelAttribute Item item,
             RedirectAttributes redirectAttributes
     ) {
-        log.info("item={}", item.toString());
-        log.info("item.open={}", item.getOpen());
-
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
