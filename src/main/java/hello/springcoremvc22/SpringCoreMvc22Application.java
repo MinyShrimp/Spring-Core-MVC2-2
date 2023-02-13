@@ -9,5 +9,4 @@ public class SpringCoreMvc22Application {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringCoreMvc22Application.class, args);
 	}
-
 }
