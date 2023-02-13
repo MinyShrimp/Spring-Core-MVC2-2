@@ -175,7 +175,7 @@ public class DeliveryCode {
 
 ### Item - 상품
 ```java
-@Getter @Setter
+@Getter @Setter @ToString
 public class Item {
     private Long id;
     private String itemName;
@@ -201,6 +201,89 @@ ENUM, 클래스, String 같은 다양한 상황을 준비했다.
 각각의 상황에 어떻게 폼의 데이터를 받을 수 있는지 하나씩 알아보자.
 
 ## 체크 박스 - 단일 1
+### addForm.html
+```html
+<hr class="my-4">
+<!-- Single Checkbox -->
+<div>판매 여부</div>
+<div>
+    <div class="form-check">
+        <input type="checkbox" id="open" name="open" class="form-check-input">
+        <label for="open" class="form-check-label">판매 오픈</label>
+    </div>
+</div>
+```
+
+### FormItemController
+```java
+@Slf4j
+@Controller
+@RequestMapping("/form/items")
+@RequiredArgsConstructor
+public class FormItemController {
+  @PostMapping("/add")
+  public String addItem(
+          @ModelAttribute Item item,
+          RedirectAttributes redirectAttributes
+  ) {
+    log.info("item={}", item);
+    log.info("item.open={}", item.getOpen());
+
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/form/items/{itemId}";
+  }
+}
+```
+
+### 실행 로그
+```
+// 체크 박스를 선택하는 경우
+item=Item(id=null, itemName=testC, price=20500, quantity=102, open=true, regions=null, itemType=null, deliveryCode=null)
+item.open=true 
+
+// 체크 박스를 해제하는 경우
+item=Item(id=null, itemName=adsf, price=20500, quantity=42, open=null, regions=null, itemType=null, deliveryCode=null)
+item.open=null 
+```
+헉! 체크 박스를 선택하지 않으면, `open` 필드 자체가 서버로 전송되지 않는다!
+
+HTML checkbox는 선택이 안되면 클라이언트에서 서버로 값 자체를 보내지 않는다. 
+수정의 경우에는 상황에 따라서 이 방식이 문제가 될 수 있다. (NPE)
+사용자가 의도적으로 체크되어 있던 값을 체크를 해제해도 저장시 아무 값도 넘어가지 않기 때문에, 
+서버 구현에 따라서 값이 오지 않은 것으로 판단해서 값을 변경하지 않을 수도 있다.
+
+`if( item.getOpen() != null ) {}` 등과 같이 해결할 수도 있겠지만, 코드가 더러워지는 불행한 미래가 기다릴뿐이다. 
+
+### 해결 방법 1
+```html
+<hr class="my-4">
+<!-- Single Checkbox -->
+<div>판매 여부</div>
+<div>
+    <div class="form-check">
+        <input type="checkbox" id="open" name="open" class="form-check-input">
+        <!-- 히든 필드 추가 -->
+        <input type="hidden" name="_open" value="on">
+        <label for="open" class="form-check-label">판매 오픈</label>
+    </div>
+</div>
+```
+```
+// 체크 박스를 선택하는 경우
+item=Item(id=null, itemName=testC, price=20500, quantity=42, open=true, regions=null, itemType=null, deliveryCode=null)
+item.open=true
+
+// 체크 박스를 해제하는 경우
+item=Item(id=null, itemName=adsf, price=100, quantity=102, open=false, regions=null, itemType=null, deliveryCode=null)
+item.open=false
+```
+
+이런 문제를 해결하기 위해서 스프링 MVC는 약간의 트릭을 사용하는데, 
+히든 필드를 하나 만들어서, `_open` 처럼 기존 체크 박스 이름 앞에 언더스코어( _ )를 붙여서 전송하면 체크를 해제했다고 인식할 수 있다. 
+히든 필드는 항상 전송된다. 
+따라서 체크를 해제한 경우 여기에서 open 은 전송되지 않고, _open 만 전송되는데, 이 경우 스프링 MVC는 체크를 해제했다고 판단한다.
 
 ## 체크 박스 - 단일 2
 

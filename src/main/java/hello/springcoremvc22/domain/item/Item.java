@@ -2,10 +2,11 @@ package hello.springcoremvc22.domain.item;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter @Setter @ToString
 public class Item {
     private Long id;
     private String itemName;
