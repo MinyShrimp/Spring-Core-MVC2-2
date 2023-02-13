@@ -366,6 +366,99 @@ public class ItemRepository {
 ![img_4.png](img_4.png)
 
 ## 체크 박스 - 멀티
+체크 박스를 멀티로 사용해서, 하나 이상을 체크할 수 있도록 해보자.
+
+* 등록 지역: 서울, 부산, 제주
+
+### FormItemController
+```java
+@Slf4j
+@Controller
+@RequestMapping("/form/items")
+@RequiredArgsConstructor
+public class FormItemController {
+  @ModelAttribute("regions")
+  public Map<String, String> regions() {
+    Map<String, String> regions = new LinkedHashMap<>();
+    regions.put("SEOUL", "서울");
+    regions.put("BUSAN", "부산");
+    regions.put("JEJU", "제주");
+    return regions;
+  }
+}
+```
+
+### ModelAttribute 의 특별한 사용법
+등록 폼, 상세화면, 수정 폼에서 모두 서울, 부산, 제주라는 체크 박스를 반복해서 보여주어야 한다.
+이렇게 하려면 각각의 컨트롤러에서 `model.addAttribute()`를 사용해서 체크 박스를 구성하는 데이터를 반복해서 넣어주어야한다.
+`@ModelAttribute`는 이렇게 컨트롤러에 있는 별도의 메서드에 적용할 수 있다.
+이렇게하면, 해당 컨트롤러를 요청할 때, `regions`에서 반환한 값이 자동으로 모델(`model`)에 담기게 된다.
+물론 이렇게 사용하지 않고, 각각의 컨트롤러 메서드에서 모델에 직접 데이터를 담아서 처리해도 된다.
+
+### addForm.html
+```html
+<!-- Multi Checkbox -->
+<div>등록 지역</div>
+<div th:each="region : ${regions}" class="form-check form-check-inline">
+    <input type="checkbox" th:field="*{regions}" th:value="${region.key}" class="form-check-input">
+    <label th:for="${#ids.prev('regions')}" th:text="${region.value}" class="form-check-label"></label>
+</div>
+```
+
+#### `th:field="*{regions}"`
+`*{regions}`는 `model`에 넘어온 `regions`가 아닌, `item.regions`이다.
+이때, `th:each`에 의해 반복되고 있는 중에 id, name을 넣어야하는데, name은 같아도 되지만, id는 모두 달라야 한다. 
+타임리프는 `regions`라는 이름을 이용해 이를 자동으로 넣어준다.
+
+* id: 변수명 + 1, 2, 3..
+* name: 변수명
+
+#### `th:for="${#ids.prev('regions')}"`
+반복되고 있는 `regions`( model에서 넘어온 )에서 `ids.prev`, `ids.next`를 이용해 동적으로 생성되는 id 값을 가져올 수 있게 지원한다.
+
+### 실행 결과
+![img_5.png](img_5.png)
+
+### 로그 출력
+```
+item = Item(
+  id=null, itemName=testC, price=20500, quantity=42, 
+  open=true, regions=[SEOUL, JEJU], itemType=null, deliveryCode=null
+)
+```
+
+### 상세페이지 - item.html
+```html
+<!-- Multi Checkbox -->
+<div>
+    <div>등록 지역</div>
+    <div th:each="region : ${regions}" class="form-check form-check-inline">
+        <input type="checkbox" th:field="${item.regions}" th:value="${region.key}" class="form-check-input" disabled>
+        <label th:for="${#ids.prev('regions')}" th:text="${region.value}" class="form-check-label"></label>
+    </div>
+</div>
+```
+
+### 상세페이지 결과
+![img_6.png](img_6.png)
+
+### 타임리프의 체크 확인
+타임리프는 `th:field`에 지정한 값과 `th:value`의 값을 비교해서 체크를 자동으로 처리해준다.
+
+### 수정페이지 - editForm.html
+```html
+<!-- Multi Checkbox -->
+<div>
+    <div>등록 지역</div>
+    <div th:each="region : ${regions}" class="form-check form-check-inline">
+        <input type="checkbox" th:field="${item.regions}" th:value="${region.key}" class="form-check-input">
+        <label th:for="${#ids.prev('regions')}" th:text="${region.value}" class="form-check-label"></label>
+    </div>
+</div>
+```
+
+### 수정페이지 결과
+![img_7.png](img_7.png)
 
 ## 라디오 버튼
 
