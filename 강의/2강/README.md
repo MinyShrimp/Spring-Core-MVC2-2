@@ -542,5 +542,80 @@ item.itemType = FOOD
 그런데 더 큰 문제는 이를 컴파일 단계에서 알아차릴 수 없고, 오직 런타임에서 발견할 수 있기 때문에 권장되는 방법이 아니다.
 
 ## 셀렉트 박스
+셀렉트 박스는 여러 선택지 중에 하나를 선택할 수 있다.
+이번 시간에는 셀렉트 박스를 자바 객체를 활용해서 개발해보자.
 
-## 정리
+### FormItemController
+```java
+@Slf4j
+@Controller
+@RequestMapping("/form/items")
+@RequiredArgsConstructor
+public class FormItemController {
+  @ModelAttribute("deliveryCodes")
+  public List<DeliveryCode> deliveryCodes() {
+    List<DeliveryCode> deliveryCodes = new ArrayList<>();
+    deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
+    deliveryCodes.add(new DeliveryCode("NORMAL", "보통 배송"));
+    deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
+    return deliveryCodes;
+  }
+}
+```
+
+### 추가페이지 - addForm.html
+```html
+<!-- Select Box -->
+<div>
+    <div>배송 방식</div>
+    <select th:field="*{deliveryCode}" class="form-select">
+        <option value="">== 배송 방식 선택 ==</option>
+        <option 
+            th:each="deliveryCode : ${deliveryCodes}" 
+            th:value="${deliveryCode.code}" 
+            th:text="${deliveryCode.displayName}"
+        ></option>
+    </select>
+</div>
+```
+
+### 추가페이지 결과
+![img_11.png](img_11.png)
+
+### 상세페이지 - item.html
+```html
+<!-- Select Box -->
+<div>
+    <div>배송 방식</div>
+    <select th:field="${item.deliveryCode}" class="form-select" disabled>
+        <option value="">== 배송 방식 선택 ==</option>
+        <option 
+            th:each="deliveryCode : ${deliveryCodes}" 
+            th:value="${deliveryCode.code}" 
+            th:text="${deliveryCode.displayName}"
+        ></option>
+    </select>
+</div>
+```
+
+### 상세페이지 결과
+![img_12.png](img_12.png)
+
+### 수정페이지 - editForm.html
+```html
+<!-- Select Box -->
+<div>
+    <div>배송 방식</div>
+    <select th:field="*{deliveryCode}" class="form-select">
+        <option value="">== 배송 방식 선택 ==</option>
+        <option 
+            th:each="deliveryCode : ${deliveryCodes}" 
+            th:value="${deliveryCode.code}" 
+            th:text="${deliveryCode.displayName}"
+        ></option>
+    </select>
+</div>
+```
+
+### 수정페이지 결과
+![img_13.png](img_13.png)
