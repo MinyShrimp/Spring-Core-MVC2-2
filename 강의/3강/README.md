@@ -211,6 +211,11 @@ public class MessageSourceTest {
 }
 ```
 
+> 참고 <br>
+> `locale = null`인 경우 내부적으로는 `Locale.getDefault()`를 호출해 시스템의 기본 로케일을 바탕으로 파일을 찾는다.<br>
+> 그래서 `messages_ko.properties` 파일을 추가하면, 
+> `locale`인자에 `null`을 입력해도 `messages` 파일이 아닌, `messages_ko` 파일을 찾게 된다. 
+
 ## 웹 애플리케이션에 메시지 적용하기
 
 ## 웹 애플리케이션에 국제화 적용하기
