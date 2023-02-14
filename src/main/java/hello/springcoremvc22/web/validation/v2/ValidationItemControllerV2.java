@@ -2,11 +2,11 @@ package hello.springcoremvc22.web.validation.v2;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
+import hello.springcoremvc22.web.validation.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ValidationItemControllerV2 {
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
 
     @GetMapping
     public String items(Model model) {
@@ -50,26 +51,7 @@ public class ValidationItemControllerV2 {
             RedirectAttributes redirectAttributes
     ) {
         // 검증 로직
-        // ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
-        if (!StringUtils.hasText(item.getItemName())) {
-            bindingResult.rejectValue("itemName", "required");
-        }
-
-        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
-            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
-        }
-
-        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
-            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
-        }
-
-        // 특정 필드가 아닌 복합 룰 검증
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
+        itemValidator.validate(item, bindingResult);
 
         // 검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {

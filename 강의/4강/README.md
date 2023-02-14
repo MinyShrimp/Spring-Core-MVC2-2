@@ -794,4 +794,92 @@ typeMismatch                   = 타입 오류입니다.
 
 ## Validator 분리 1
 
+### 목표
+
+복잡한 검증 로직을 별도로 분리하자.
+
+### ItemValidator
+
+```java
+@Component
+public class ItemValidator implements Validator {
+    /**
+     * Item 타입과 clazz 타입이 같은지 검사
+     */
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Item.class.isAssignableFrom(clazz);
+    }
+
+    /**
+     * 검증 로직
+     *
+     * @param target 유효성을 검사할 객체
+     * @param errors BindingResult 의 부모 객체
+     */
+    @Override
+    public void validate(Object target, Errors errors) {
+        Item item = (Item) target;
+
+        // 검증 로직
+        // itemName != null && itemName != " "
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "itemName", "required");
+
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            errors.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            errors.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                errors.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+    }
+}
+```
+
+* `supports() {}`: 해당 검증기를 지원하는 여부 확인
+* `validate(Object target, Errors errors) {}`: 검증 대상 객체와 BindingResult
+
+### ValidationItemController V2
+
+```java
+@Slf4j
+@Controller
+@RequestMapping("/validation/v2/items")
+@RequiredArgsConstructor
+public class ValidationItemControllerV2 {
+    private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+    
+    @PostMapping("/add")
+    public String addItem(
+            @ModelAttribute Item item,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+        // 검증 로직
+        itemValidator.validate(item, bindingResult);
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+}
+```
+
 ## Validator 분리 2
