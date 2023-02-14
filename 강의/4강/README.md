@@ -433,6 +433,108 @@ new ObjectError(
 
 ## 오류 코드와 메시지 처리 1
 
+### 목표
+
+오류 메시지를 체계적으로 다루어보자.
+
+### Errors 메시지 파일 생성
+
+`application.properties`
+
+```properties
+spring.messages.basename = config.messages.messages,config.errors.errors
+```
+
+`errors.properties`
+
+```properties
+required.item.itemName = 상품 이름은 필수입니다.
+range.item.price       = 가격은 {0} ~ {1} 까지 허용합니다.
+max.item.quantity      = 수량은 최대 {0} 까지 허용합니다.
+totalPriceMin          = 가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+```
+
+### ValidationItemController
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 검증 로직
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "itemName", item.getItemName(),
+                        false, new String[]{"required.item.itemName"},
+                        null, null
+                )
+        );
+    }
+
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "price", item.getPrice(),
+                        false, new String[]{"range.item.price"},
+                        new Object[]{1000, 1000000}, null
+                )
+        );
+    }
+
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "quantity", item.getQuantity(),
+                        false, new String[]{"max.item.quantity"},
+                        new Object[]{9999}, null
+                )
+        );
+    }
+
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.addError(
+                    new ObjectError(
+                            "item", new String[]{"totalPriceMin"},
+                            new Object[]{10000, resultPrice}, null
+                    )
+            );
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        log.info("errors = {}", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v2/items/{itemId}";
+}
+```
+
+### 정리
+
+```java
+new FieldError(
+        "item", "price", item.getPrice(),
+        false, new String[]{"range.item.price"},
+        new Object[]{1000, 1000000}, null
+)
+```
+
+* `codes`: `required.item.itemName`을 사용해서 메시지 코드를 지정한다.
+    * 배열로 여러 값을 전달할 수 있는데, 순서대로 매칭해서 처음 매칭되는 메시지가 사용된다.
+* `arguments`: `new Object[]{1000, 1000000}`를 사용해서 코드의 `{0}`, `{1}`로 치환한 값을 전달한다.
+
 ## 오류 코드와 메시지 처리 2
 
 ## 오류 코드와 메시지 처리 3
