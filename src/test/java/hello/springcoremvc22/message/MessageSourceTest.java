@@ -57,8 +57,8 @@ public class MessageSourceTest {
 
     /**
      * 2번째 인자에 "new Object[]{}"을 이용해 인자를 줄 수 있다.
-     *  - hello.name = 안녕 {0}
-     *  - => 안녕 Spring
+     * - hello.name = 안녕 {0}
+     * - => 안녕 Spring
      */
     @Test
     @DisplayName("매개 변수 사용")

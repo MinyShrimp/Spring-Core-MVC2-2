@@ -2,80 +2,109 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
-        href="../css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .container {
-            max-width: 560px;
-        }
-    </style>
+    <link href="../css/bootstrap.min.css"
+          rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link href="../css/main.css" rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
 
 <div class="container">
     <div class="py-5 text-center">
-        <h2>상품 상세</h2>
+        <h2>[[#{page.item}]]</h2>
     </div>
 
     <!-- 추가 -->
     <h2 th:if="${param.status}" th:text="'저장 완료'"></h2>
 
     <div>
-        <label for="itemId">상품 ID</label>
-        <input type="text" id="itemId" name="itemId" class="form-control" value="1" th:value="${item.id}" readonly>
+        <label for="itemId">[[#{label.item.id}]]</label>
+        <input class="form-control"
+               id="itemId"
+               name="itemId"
+               readonly
+               th:value="${item.id}"
+               type="text"
+               value="1">
     </div>
     <div>
-        <label for="itemName">상품명</label>
-        <input type="text" id="itemName" name="itemName" class="form-control" value="상품A" th:value="${item.itemName}" readonly>
+        <label for="itemName">[[#{label.item.itemName}]]</label>
+        <input class="form-control"
+               id="itemName"
+               name="itemName"
+               readonly
+               th:value="${item.itemName}"
+               type="text"
+               value="상품A">
     </div>
     <div>
-        <label for="price">가격</label>
-        <input type="text" id="price" name="price" class="form-control" value="10000" th:value="${item.price}" readonly>
+        <label for="price">[[#{label.item.price}]]</label>
+        <input class="form-control"
+               id="price"
+               name="price"
+               readonly
+               th:value="${item.price}"
+               type="text"
+               value="10000">
     </div>
     <div>
-        <label for="quantity">수량</label>
-        <input type="text" id="quantity" name="quantity" class="form-control" value="10" th:value="${item.quantity}" readonly>
+        <label for="quantity">[[#{label.item.quantity}]]</label>
+        <input class="form-control"
+               id="quantity"
+               name="quantity"
+               readonly
+               th:value="${item.quantity}"
+               type="text"
+               value="10">
     </div>
 
     <hr class="my-4">
 
     <!-- Single Checkbox -->
     <div>
-        <div> 판매 여부 </div>
+        <div> 판매 여부</div>
         <div class="form-check">
-            <input type="checkbox" th:field="${item.open}" class="form-check-input" disabled>
-            <label for="open" class="form-check-label">판매 오픈</label>
+            <input class="form-check-input" disabled th:field="${item.open}" type="checkbox">
+            <label class="form-check-label" for="open">판매 오픈</label>
         </div>
     </div>
 
     <!-- Multi Checkbox -->
     <div>
         <div>등록 지역</div>
-        <div th:each="region : ${regions}" class="form-check form-check-inline">
-            <input type="checkbox" th:field="${item.regions}" th:value="${region.key}" class="form-check-input" disabled>
-            <label th:for="${#ids.prev('regions')}" th:text="${region.value}" class="form-check-label"></label>
+        <div class="form-check form-check-inline" th:each="region : ${regions}">
+            <input class="form-check-input"
+                   disabled
+                   th:field="${item.regions}"
+                   th:value="${region.key}"
+                   type="checkbox">
+            <label class="form-check-label" th:for="${#ids.prev('regions')}" th:text="${region.value}"></label>
         </div>
     </div>
 
     <!-- Radio Button -->
     <div>
         <div>상품 종류</div>
-        <!-- <div th:each="type : ${T(hello.springcoremvc22.domain.item.ItemType).values()}" class="form-check form-check-inline"> -->
-        <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
-            <input type="radio" th:field="${item.itemType}" th:value="${type.name()}" class="form-check-input" disabled>
-            <label th:for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label"></label>
+        <div class="form-check form-check-inline" th:each="type : ${itemTypes}">
+            <input class="form-check-input"
+                   disabled
+                   th:field="${item.itemType}"
+                   th:value="${type.name()}"
+                   type="radio">
+            <label class="form-check-label"
+                   th:for="${#ids.prev('itemType')}"
+                   th:text="${type.description}"></label>
         </div>
     </div>
 
     <!-- Select Box -->
     <div>
         <div>배송 방식</div>
-        <select th:field="${item.deliveryCode}" class="form-select" disabled>
+        <select class="form-select" disabled th:field="${item.deliveryCode}">
             <option value="">== 배송 방식 선택 ==</option>
-            <option 
-                th:each="deliveryCode : ${deliveryCodes}" 
-                th:value="${deliveryCode.code}" 
-                th:text="${deliveryCode.displayName}"
+            <option
+                    th:each="deliveryCode : ${deliveryCodes}"
+                    th:text="${deliveryCode.displayName}"
+                    th:value="${deliveryCode.code}"
             ></option>
         </select>
     </div>
@@ -84,16 +113,18 @@
 
     <div class="row">
         <div class="col">
-        <button class="w-100 btn btn-primary btn-lg"
-                onclick="location.href='editForm.html'"
-                th:onclick="|location.href='@{/form/items/{itemId}/edit(itemId=${item.id})}'|"
-                type="button">상품 수정</button>
+            <button class="w-100 btn btn-primary btn-lg"
+                    onclick="location.href='editForm.html'"
+                    th:onclick="|location.href='@{/form/items/{itemId}/edit(itemId=${item.id})}'|"
+                    type="button">[[#{button.save}]]
+            </button>
         </div>
         <div class="col">
-        <button class="w-100 btn btn-secondary btn-lg"
-                onclick="location.href='items.html'"
-                th:onclick="|location.href='@{/form/items}'|"
-                type="button">목록으로</button>
+            <button class="w-100 btn btn-secondary btn-lg"
+                    onclick="location.href='items.html'"
+                    th:onclick="|location.href='@{/form/items}'|"
+                    type="button">[[#{button.cancel}]]
+            </button>
         </div>
     </div>
 </div> <!-- /container -->
