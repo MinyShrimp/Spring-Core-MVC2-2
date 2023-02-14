@@ -308,6 +308,129 @@ public ObjectError(String objectName, String defaultMessage) {}
 
 ## FieldError, ObjectError
 
+### 목표
+
+* 사용자 입력 오류 메시지가 화면에 남도록 하자.
+    * 예) 가격을 1000원 미만으로 설정시 입력한 값이 남아있어야 한다.
+* FieldError, ObjectError에 대해서 더 자세히 알아보자.
+
+### addItem
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 검증 로직
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "itemName", item.getItemName(),
+                        false, null, null,
+                        "상품 이름은 필수입니다."
+                )
+        );
+    }
+
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "price", item.getPrice(),
+                        false, null, null,
+                        "가격은 1,000 ~ 1,000,000 까지 허용합니다."
+                )
+        );
+    }
+
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.addError(
+                new FieldError(
+                        "item", "quantity", item.getQuantity(),
+                        false, null, null,
+                        "수량은 최대 9,999 까지 허용합니다."
+                )
+        );
+    }
+
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.addError(
+                    new ObjectError(
+                            "item", null, new Object[]{resultPrice},
+                            "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = {0}"
+                    )
+            );
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        log.info("errors = {}", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v2/items/{itemId}";
+}
+```
+
+### FieldError
+
+```java
+public FieldError(
+    String objectName, String field, @Nullable Object rejectedValue, 
+    boolean bindingFailure, @Nullable String[] codes, @Nullable Object[] arguments, 
+    @Nullable String defaultMessage
+)
+```
+
+* objectName: 객체 이름
+* field: 필드 이름
+* rejectedValue: 사용자가 입력한 값 (거절된 값)
+* codes: 메시지 코드
+* arguments: 메시지에서 사용하는 인자
+* defaultMessage: 기본 오류 메시지
+
+### ObjectError
+
+```java
+public ObjectError(
+    String objectName, @Nullable String[] codes, @Nullable Object[] arguments, 
+    @Nullable String defaultMessage
+)
+```
+
+* objectName: 객체 이름
+* codes: 메시지 코드
+* arguments: 메시지에서 사용하는 인자
+* defaultMessage: 기본 오류 메시지
+
+### 메시지 사용법
+
+```java
+new ObjectError(
+        "item", null, new Object[]{resultPrice},
+        "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = {0}"
+)
+```
+
+### 타임리프의 사용자 입력 값 유지
+
+`th:field="*{itemName}"`
+
+### 스프링의 바인딩 오류 처리
+
+타입 오류로 바인딩에 실패하면 스프링은 `FieldError`를 생성하면서 사용자가 입력한 값을 넣어둔다.
+그리고 해당 오류를 `BindingResult`에 담아서 컨트롤러를 호출한다.
+따라서 타입 오류 같은 바인딩 실패시에도 사용자의 오류 메시지를 정상 출력할 수 있다.
+
 ## 오류 코드와 메시지 처리 1
 
 ## 오류 코드와 메시지 처리 2
