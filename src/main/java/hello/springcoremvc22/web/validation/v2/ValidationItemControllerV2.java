@@ -50,6 +50,7 @@ public class ValidationItemControllerV2 {
             RedirectAttributes redirectAttributes
     ) {
         // 검증 로직
+        // ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.rejectValue("itemName", "required");
         }

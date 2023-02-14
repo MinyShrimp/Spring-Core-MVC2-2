@@ -726,6 +726,31 @@ range                      = {0} ~ {1} 범위를 허용합니다.
 max                        = {0} 까지 허용합니다.
 ```
 
+### ValidationUtils
+
+#### 사용전
+
+```java
+if (!StringUtils.hasText(item.getItemName())) {
+    bindingResult.rejectValue("itemName", "required");
+}
+```
+
+#### 사용후
+
+```java
+ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
+```
+
+이 방법은 Empty(빈 값이 들어왔을 때), 공백(" ")만 처리한다.
+
+### 정리
+
+* `rejectValue()` 호출
+* `MessageCodesResolver`를 사용해서 검증 오류 코드로 메시지 코드들을 생성
+* `new FieldError()`를 생성하면서 메시지 코드들을 보관
+* `th:errors`에서 메시지 코드들로 메시지를 순서대로 메시지에서 찾고, 노출
+
 ## 오류 코드와 메시지 처리 6
 
 ## Validator 분리 1
