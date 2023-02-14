@@ -13,20 +13,39 @@
     </div>
 
     <form action="item.html" method="post" th:action th:object="${item}">
+        <div th:if="${errors?.containsKey('globalError')}">
+            <p class="field-error" th:text="${errors['globalError']}"></p>
+        </div>
+
         <div>
             <label for="itemName">[[#{label.item.itemName}]]</label>
-            <input class="form-control" th:field="*{itemName}" th:placeholder="#{input.placeholder.name}" type="text">
+            <!-- <input class="form-control" th:field="*{itemName}" th:placeholder="#{input.placeholder.name}" type="text"> -->
+            <input th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'"
+                   th:field="*{itemName}"
+                   th:placeholder="#{input.placeholder.name}"
+                   type="text">
+            <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}"></div>
         </div>
         <div>
             <label for="price">[[#{label.item.price}]]</label>
-            <input class="form-control" th:field="*{price}" th:placeholder="#{input.placeholder.price}" type="text">
+            <!-- <input class="form-control" th:field="*{price}" th:placeholder="#{input.placeholder.price}" type="text"> -->
+            <input th:class="${errors?.containsKey('price')} ? 'form-control field-error' : 'form-control'"
+                   th:field="*{price}"
+                   th:placeholder="#{input.placeholder.price}"
+                   type="text">
+            <div class="field-error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}"></div>
         </div>
         <div>
             <label for="quantity">[[#{label.item.quantity}]]</label>
-            <input class="form-control"
+            <!-- <input class="form-control"
+                   th:field="*{quantity}"
+                   th:placeholder="#{input.placeholder.quantity}"
+                   type="text"> -->
+            <input th:class="${errors?.containsKey('quantity')} ? 'form-control field-error' : 'form-control'"
                    th:field="*{quantity}"
                    th:placeholder="#{input.placeholder.quantity}"
                    type="text">
+            <div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}"></div>
         </div>
 
         <hr class="my-4">
