@@ -116,6 +116,31 @@ violation.getMessage() = 1000에서 100000 사이여야 합니다
 
 ## 스프링 적용
 
+### 스프링 MVC는 어떻게 Bean Validator를 사용할까?
+
+스프링 부트가 `spring-boot-starter-validation` 라이브러리를 넣으면
+자동으로 Bean Validator를 인지하고 스프링에 통합한다.
+
+### 스프링 부트는 자동으로 글로벌 Validator를 등록한다.
+
+`LocalValidatorFactoryBean`을 글로벌 Validator로 등록한다.
+이 Validator는 `@NotNull` 같은 애노테이션을 보고 검증을 수행한다.
+이렇게 글로벌 Validator가 적용되어 있기 때문에, `@Valid`, `@Validated`만 적용하면 된다.
+검증 오류가 발생하면, `FieldError`, `ObjectError`를 생성해서 `BindingResult`에 담아준다.
+
+### 검증 순서
+
+1. `@ModelAttribute` 각각의 플드에 타입 변환 시도
+    1. 성공하면 다음으로
+    2. 실패하면 `typeMismatch`로 `FieldError` 추가
+2. Validator 적용
+
+### 바인딩에 성공한 필드만 Bean Validator 적용
+
+BeanValidator는 바인딩에 실패한 필드는 BeanValidation을 적용하지 않는다.
+생각해보면 타입 변환에 성공해서 바인딩에 성공한 필드여야 BeanValidation 적용이 의미 있다.
+(일단 모델 객체에 바인딩 받는 값이 정상으로 들어와야 검증도 의미가 있다.)
+
 ## 에러 코드
 
 ## 오브젝트 오류

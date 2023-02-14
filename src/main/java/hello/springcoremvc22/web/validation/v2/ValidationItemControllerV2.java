@@ -2,7 +2,6 @@ package hello.springcoremvc22.web.validation.v2;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
-import hello.springcoremvc22.web.validation.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

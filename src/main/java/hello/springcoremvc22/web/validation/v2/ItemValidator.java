@@ -1,4 +1,4 @@
-package hello.springcoremvc22.web.validation;
+package hello.springcoremvc22.web.validation.v2;
 
 import hello.springcoremvc22.domain.validation.Item;
 import org.springframework.stereotype.Component;

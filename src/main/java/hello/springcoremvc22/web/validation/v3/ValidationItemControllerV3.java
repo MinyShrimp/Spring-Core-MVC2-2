@@ -2,14 +2,12 @@ package hello.springcoremvc22.web.validation.v3;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
-import hello.springcoremvc22.web.validation.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -21,12 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ValidationItemControllerV3 {
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
-
-    @InitBinder
-    public void init(WebDataBinder dataBinder) {
-        dataBinder.addValidators(itemValidator);
-    }
 
     @GetMapping
     public String items(Model model) {
