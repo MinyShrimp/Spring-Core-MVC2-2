@@ -284,6 +284,28 @@ public ObjectError(String objectName, String defaultMessage) {}
 
 ## BindingResult 2
 
+### BindingResult 역할
+
+* 스프링이 제공하는 검증 오류를 보관하는 객체이다. 검증 오류가 발생하면 여기에 보관된다.
+* `BindingResult`가 있으면, `@ModelAttribute`에 데이터 바인딩 시 오류가 발생해도 컨트롤러가 호출된다.
+
+### `@ModelAttribute`에 바인딩시 타입 오류가 발생하면?
+
+![img_3.png](img_3.png)
+
+### `BindingResult`에 검증 오류를 적용하는 3가지 방법
+
+* `@ModelAttribute`의 객체에 타입 오류 등으로 바인딩이 실패하는 경우 스프링이 `FieldError`를 생성해서 `BindingResult`에 넣어준다.
+* 개발자가 직접 넣어준다.
+* `Validator` 사용
+
+### BindingResult, Errors
+
+* `BindingResult` 인터페이스는 `Errors` 인터페이스를 상속받는다.
+* 실제 넘어오는 구현체는 `BeanPropertyBindingResult` 이다.
+* `Errors` 인터페이스는 단순한 오류 저장과 조회 기능을 제공한다.
+* `BindingResult`는 여기에 더해 `addError()` 등, 추가적인 기능을 제공한다.
+
 ## FieldError, ObjectError
 
 ## 오류 코드와 메시지 처리 1
