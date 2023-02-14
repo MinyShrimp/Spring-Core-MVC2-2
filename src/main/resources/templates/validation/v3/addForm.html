@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link href="../../css/bootstrap.min.css"
+          rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link href="../../css/main.css" rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>[[#{page.addItem}]]</h2>
+    </div>
+
+    <form action="item.html" method="post" th:action th:object="${item}">
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
+
+        <div>
+            <label for="itemName">[[#{label.item.itemName}]]</label>
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{itemName}"
+                   th:placeholder="#{input.placeholder.name}"
+                   type="text">
+            <div class="field-error" th:errors="*{itemName}"></div>
+        </div>
+        <div>
+            <label for="price">[[#{label.item.price}]]</label>
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{price}"
+                   th:placeholder="#{input.placeholder.price}"
+                   type="text">
+            <div class="field-error" th:errors="*{price}"></div>
+        </div>
+        <div>
+            <label for="quantity">[[#{label.item.quantity}]]</label>
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{quantity}"
+                   th:placeholder="#{input.placeholder.quantity}"
+                   type="text">
+            <div class="field-error" th:errors="*{quantity}"></div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" type="submit">[[#{button.save}]]</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        onclick="location.href='items.html'"
+                        th:onclick="|location.href='@{/validation/v3/items}'|"
+                        type="button">[[#{button.cancel}]]
+                </button>
+            </div>
+        </div>
+    </form>
+</div> <!-- /container -->
+</body>
+</html>
