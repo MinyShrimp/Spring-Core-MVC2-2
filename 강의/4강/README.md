@@ -172,6 +172,116 @@ public String addItem(
 
 ## BindingResult 1
 
+```java
+@PostMapping("/add")
+public String addItemV1(
+        @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 검증 로직
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+    }
+
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+    }
+
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."));
+    }
+
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        log.info("errors = {}", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v2/items/{itemId}";
+}
+```
+
+> **주의**<br>
+> `BindingResult bindingResult` 파라미터 위치는 `@ModelAttribute Item item` 다음에 와야 한다.
+
+### FieldError
+
+```java
+public FieldError(String objectName, String field, String defaultMessage) {}
+```
+
+필드에 오류가 있으면 `FieldError`객체를 생성해서 `bindingResult`에 담아두면 된다.
+
+* objectName: @ModelAttribute 이름
+* field: 오류가 발생한 필드 이름
+* defaultMessage: 오류 기본 메시지
+
+### 글로벌 에러 - ObjectError
+
+```java
+public ObjectError(String objectName, String defaultMessage) {}
+```
+
+특정 필드를 넘어서는 오류가 있으면 `ObjectError` 객체를 생성해서 `bindingResult`에 담아두면 된다.
+
+### addForm.html
+
+```html
+<div th:if="${#fields.hasGlobalErrors()}">
+    <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+</div>
+
+<div>
+    <label for="itemName">[[#{label.item.itemName}]]</label>
+    <input class="form-control"
+           th:errorclass="field-error"
+           th:field="*{itemName}"
+           th:placeholder="#{input.placeholder.name}"
+           type="text">
+    <div class="field-error" th:errors="*{itemName}"></div>
+</div>
+<div>
+    <label for="price">[[#{label.item.price}]]</label>
+    <input class="form-control"
+           th:errorclass="field-error"
+           th:field="*{price}"
+           th:placeholder="#{input.placeholder.price}"
+           type="text">
+    <div class="field-error" th:errors="*{price}"></div>
+</div>
+<div>
+    <label for="quantity">[[#{label.item.quantity}]]</label>
+    <input class="form-control"
+           th:errorclass="field-error"
+           th:field="*{quantity}"
+           th:placeholder="#{input.placeholder.quantity}"
+           type="text">
+    <div class="field-error" th:errors="*{quantity}"></div>
+</div>
+```
+
+### 타임리프 스프링 검증 오류 통합 기능
+
+타임리프는 스프링의 `BindingResult`를 활용해서 편리하게 검증 오류를 표현하는 기능을 제공한다.
+
+* `#fields`: `BindingResult`에 접근
+* `th:errors`: 해당 필드에 오류가 있는 경우에 태그를 출력한다. `th:if`의 편의 버전이다.
+* `th:errorclass`: `th:field`에서 지정한 필드에 오류가 있다면, `class`정보를 추가한다.
+* [공식 메뉴얼](https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html#validation-and-error-messages)
+
 ## BindingResult 2
 
 ## FieldError, ObjectError
