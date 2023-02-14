@@ -6,15 +6,13 @@ import hello.springcoremvc22.domain.item.ItemRepository;
 import hello.springcoremvc22.domain.item.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -22,13 +20,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FormItemController {
     private final ItemRepository itemRepository;
+    private final MessageSource ms;
 
     @ModelAttribute("regions")
-    public Map<String, String> regions() {
+    public Map<String, String> regions(
+            Locale locale
+    ) {
         Map<String, String> regions = new LinkedHashMap<>();
-        regions.put("SEOUL", "서울");
-        regions.put("BUSAN", "부산");
-        regions.put("JEJU", "제주");
+        regions.put("SEOUL", ms.getMessage("option.regions.seoul", null, locale));
+        regions.put("BUSAN", ms.getMessage("option.regions.busan", null, locale));
+        regions.put("JEJU", ms.getMessage("option.regions.jeju", null, locale));
         return regions;
     }
 
@@ -38,11 +39,13 @@ public class FormItemController {
     }
 
     @ModelAttribute("deliveryCodes")
-    public List<DeliveryCode> deliveryCodes() {
+    public List<DeliveryCode> deliveryCodes(
+            Locale locale
+    ) {
         List<DeliveryCode> deliveryCodes = new ArrayList<>();
-        deliveryCodes.add(new DeliveryCode("FAST",   "빠른 배송"));
-        deliveryCodes.add(new DeliveryCode("NORMAL", "보통 배송"));
-        deliveryCodes.add(new DeliveryCode("SLOW",   "느린 배송"));
+        deliveryCodes.add(new DeliveryCode("FAST", ms.getMessage("option.deliveryCode.fast", null, locale)));
+        deliveryCodes.add(new DeliveryCode("NORMAL", ms.getMessage("option.deliveryCode.normal", null, locale)));
+        deliveryCodes.add(new DeliveryCode("SLOW", ms.getMessage("option.deliveryCode.slow", null, locale)));
         return deliveryCodes;
     }
 

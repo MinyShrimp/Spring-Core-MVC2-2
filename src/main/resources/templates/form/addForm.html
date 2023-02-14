@@ -33,16 +33,16 @@
 
         <!-- Single Checkbox -->
         <div>
-            <div>판매 여부</div>
+            <div>[[#{label.open}]]</div>
             <div class="form-check">
                 <input class="form-check-input" th:field="*{open}" type="checkbox">
-                <label class="form-check-label" for="open">판매 오픈</label>
+                <label class="form-check-label" for="open">[[#{label.open.check}]]</label>
             </div>
         </div>
 
         <!-- Multi Checkbox -->
         <div>
-            <div>등록 지역</div>
+            <div>[[#{label.region}]]</div>
             <div class="form-check form-check-inline" th:each="region : ${regions}">
                 <input class="form-check-input" th:field="*{regions}" th:value="${region.key}" type="checkbox">
                 <label class="form-check-label"
@@ -53,7 +53,7 @@
 
         <!-- Radio Button -->
         <div>
-            <div>상품 종류</div>
+            <div>[[#{label.itemType}]]</div>
             <div class="form-check form-check-inline" th:each="type : ${itemTypes}">
                 <input class="form-check-input" th:field="*{itemType}" th:value="${type.name()}" type="radio">
                 <label class="form-check-label"
@@ -64,9 +64,9 @@
 
         <!-- Select Box -->
         <div>
-            <div>배송 방식</div>
+            <div>[[#{label.deliveryCode}]]</div>
             <select class="form-select" th:field="*{deliveryCode}">
-                <option value="">== 배송 방식 선택 ==</option>
+                <option value="">[[#{option.deliveryCode.none}]]</option>
                 <option
                         th:each="deliveryCode : ${deliveryCodes}"
                         th:text="${deliveryCode.displayName}"
