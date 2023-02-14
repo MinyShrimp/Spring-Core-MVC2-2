@@ -537,6 +537,75 @@ new FieldError(
 
 ## 오류 코드와 메시지 처리 2
 
+### 목표
+
+* `FieldError`, `ObjectError`는 다루기 너무 번거롭다.
+* 오류 코드도 좀 더 자동화 할 수 있지 않을까?
+
+### ValidationItemControllerV2
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 검증 로직
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.rejectValue("itemName", "required");
+    }
+
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+    }
+
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+    }
+
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        log.info("errors = {}", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v2/items/{itemId}";
+}
+```
+
+### rejectValue, reject
+
+```java
+void reject(String errorCode);
+void reject(String errorCode, String defaultMessage);
+void reject(String errorCode, @Nullable Object[] errorArgs, @Nullable String defaultMessage);
+
+void rejectValue(@Nullable String field, String errorCode);
+void rejectValue(@Nullable String field, String errorCode, String defaultMessage);
+void rejectValue(
+    @Nullable String field, String errorCode,
+    @Nullable Object[] errorArgs, @Nullable String defaultMessage
+);
+```
+
+* field: 오류 필드명
+* errorCode: `MessageResolver`를 위한 오류 코드
+* errorArgs: 오류 메시지에서 {0}을 치환하기 위한 값
+* defaultMessage: 오류 메시지를 찾을 수 없을 때 사용하는 기본 메시지
+
 ## 오류 코드와 메시지 처리 3
 
 ## 오류 코드와 메시지 처리 4
