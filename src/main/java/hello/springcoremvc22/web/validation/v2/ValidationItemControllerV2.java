@@ -1,4 +1,4 @@
-package hello.springcoremvc22.web.validation;
+package hello.springcoremvc22.web.validation.v2;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
@@ -16,16 +16,16 @@ import java.util.Map;
 
 @Slf4j
 @Controller
-@RequestMapping("/validation/v1/items")
+@RequestMapping("/validation/v2/items")
 @RequiredArgsConstructor
-public class ValidationItemControllerV1 {
+public class ValidationItemControllerV2 {
     private final ItemRepository itemRepository;
 
     @GetMapping
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
-        return "validation/v1/items";
+        return "validation/v2/items";
     }
 
     @GetMapping("/{itemId}")
@@ -35,13 +35,13 @@ public class ValidationItemControllerV1 {
     ) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "validation/v1/item";
+        return "validation/v2/item";
     }
 
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
-        return "validation/v1/addForm";
+        return "validation/v2/addForm";
     }
 
     @PostMapping("/add")
@@ -77,14 +77,14 @@ public class ValidationItemControllerV1 {
         // 검증에 실패하면 다시 입력 폼으로
         if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
-            return "validation/v1/addForm";
+            return "validation/v2/addForm";
         }
 
         // 성공 로직
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/validation/v1/items/{itemId}";
+        return "redirect:/validation/v2/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
@@ -94,7 +94,7 @@ public class ValidationItemControllerV1 {
     ) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "validation/v1/editForm";
+        return "validation/v2/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
@@ -103,6 +103,6 @@ public class ValidationItemControllerV1 {
             @ModelAttribute Item item
     ) {
         itemRepository.update(itemId, item);
-        return "redirect:/validation/v1/items/{itemId}";
+        return "redirect:/validation/v2/items/{itemId}";
     }
 }
