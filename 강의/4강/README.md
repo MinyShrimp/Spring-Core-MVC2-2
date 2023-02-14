@@ -626,6 +626,69 @@ required               = 필수 값 입니다.
 
 ## 오류 코드와 메시지 처리 4
 
+### MessageCodesResolverTest
+
+```java
+public class MessageCodesResolverTest {
+    MessageCodesResolver codesResolver = new DefaultMessageCodesResolver();
+
+    @Test
+    void messageCodesResolverObject() {
+        String[] messageCodes = codesResolver.resolveMessageCodes("required", "item");
+        assertThat(messageCodes).containsExactly("required.item", "required");
+    }
+
+    @Test
+    void messageCodesResolverField() {
+        String[] messageCodes = codesResolver.resolveMessageCodes(
+                "required", "item", "itemName",
+                String.class
+        );
+        assertThat(messageCodes).containsExactly(
+                "required.item.itemName",
+                "required.itemName",
+                "required.java.lang.String",
+                "required"
+        );
+    }
+}
+```
+
+### DefaultMessageCodesResolver 기본 메시지 생성 규칙
+
+#### ObjectError - reject
+
+```
+객체 오류의 경우 다음 순서로 2가지 생성
+1.: code + "." + object name
+2.: code
+
+예) 오류 코드: required, object name: item
+1.: required.item
+2.: required
+```
+
+#### FieldError - rejectValue
+
+````
+필드 오류의 경우 다음 순서로 4가지 메시지 코드 생성
+1.: code + "." + object name + "." + field name
+2.: code + "." + field name
+3.: code + "." + field type
+4.: code
+
+예) 오류 코드: typeMismatch, object name "user", field "age", field type: int
+1. "typeMismatch.user.age"
+2. "typeMismatch.age"
+3. "typeMismatch.int"
+4. "typeMismatch"
+````
+
+### 동작 방식
+
+* `rejectValue`, `reject`는 내부에서 `MessageCodesResolver`를 사용한다.
+* `FieldError`, `ObjectError`의 오류 코드를 이 `MessageCodesResolver`를 통해서 생성된 순서대로 오류 코드를 보관한다.
+
 ## 오류 코드와 메시지 처리 5
 
 ## 오류 코드와 메시지 처리 6
