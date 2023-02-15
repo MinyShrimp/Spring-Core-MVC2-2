@@ -226,6 +226,73 @@ ScriptAssert는 제약이 많고 복잡하여, 오브젝트 오류의 경우 저
 
 ## 수정에 적용
 
+### ValidationItemController V3
+
+```java
+@PostMapping("/{itemId}/edit")
+public String edit(
+        @PathVariable long itemId,
+        @Validated @ModelAttribute Item item,
+        BindingResult bindingResult
+) {
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        return "validation/v3/editForm";
+    }
+
+    // 성공 로직
+    itemRepository.update(itemId, item);
+    return "redirect:/validation/v3/items/{itemId}";
+}
+```
+
+### editForm.html
+
+```html
+<form action="item.html" method="post" th:action th:object="${item}">
+    <div th:if="${#fields.hasGlobalErrors()}">
+        <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+    </div>
+
+    <div>
+        <label for="id">[[#{label.item.id}]]</label>
+        <input class="form-control" readonly th:field="*{id}" type="text">
+    </div>
+    <div>
+        <label for="itemName">[[#{label.item.itemName}]]</label>
+        <input class="form-control"
+               th:errorclass="field-error"
+               th:field="*{itemName}"
+               type="text">
+        <div class="field-error" th:errors="*{itemName}"></div>
+    </div>
+    <div>
+        <label for="price">[[#{label.item.price}]]</label>
+        <input class="form-control"
+               th:errorclass="field-error"
+               th:field="*{price}"
+               type="text">
+        <div class="field-error" th:errors="*{price}"></div>
+    </div>
+    <div>
+        <label for="quantity">[[#{label.item.quantity}]]</label>
+        <input class="form-control"
+               th:errorclass="field-error"
+               th:field="*{quantity}"
+               type="text">
+        <div class="field-error" th:errors="*{quantity}"></div>
+    </div>
+</form>
+```
+
 ## 한계
 
 ## groups

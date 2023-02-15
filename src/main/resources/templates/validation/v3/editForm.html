@@ -15,21 +15,37 @@
     </div>
 
     <form action="item.html" method="post" th:action th:object="${item}">
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
+
         <div>
             <label for="id">[[#{label.item.id}]]</label>
             <input class="form-control" readonly th:field="*{id}" type="text">
         </div>
         <div>
             <label for="itemName">[[#{label.item.itemName}]]</label>
-            <input class="form-control" th:field="*{itemName}" type="text">
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{itemName}"
+                   type="text">
+            <div class="field-error" th:errors="*{itemName}"></div>
         </div>
         <div>
             <label for="price">[[#{label.item.price}]]</label>
-            <input class="form-control" th:field="*{price}" type="text">
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{price}"
+                   type="text">
+            <div class="field-error" th:errors="*{price}"></div>
         </div>
         <div>
             <label for="quantity">[[#{label.item.quantity}]]</label>
-            <input class="form-control" th:field="*{quantity}" type="text">
+            <input class="form-control"
+                   th:errorclass="field-error"
+                   th:field="*{quantity}"
+                   type="text">
+            <div class="field-error" th:errors="*{quantity}"></div>
         </div>
 
         <hr class="my-4">
