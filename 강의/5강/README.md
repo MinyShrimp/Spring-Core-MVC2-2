@@ -339,6 +339,83 @@ public class Item {
 
 ## groups
 
+### 위의 문제를 해결하는 방법은 2가지가 있다.
+
+1. BeanValidation의 groups 기능을 사용한다.
+2. Item을 직접 사용하지 않고, ItemSaveForm, ItemUpdateForm 같은 폼 전송을 위한 별도의 모델 객체를 만들어서 사용한다. (DTO)
+
+### groups 기능 사용
+
+#### SaveCheck 인터페이스
+
+```java
+public interface SaveCheck {
+}
+```
+
+#### UpdateCheck 인터페이스
+
+```java
+public interface UpdateCheck {
+}
+```
+
+### Item - groups 적용
+
+```java
+@Getter
+@Setter
+@ToString
+public class Item {
+    @NotNull(groups = UpdateCheck.class)
+    private Long id;
+
+    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
+    private String itemName;
+
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Range(min = 1000, max = 100000, groups = {SaveCheck.class, UpdateCheck.class})
+    private Integer price;
+
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Max(value = 9999, groups = SaveCheck.class)
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+
+### ValidationItemController V3
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @Validated(SaveCheck.class) @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) { ... }
+
+@PostMapping("/{itemId}/edit")
+public String edit(
+        @PathVariable long itemId,
+        @Validated(UpdateCheck.class) @ModelAttribute Item item,
+        BindingResult bindingResult
+) { ... }
+```
+
+### 정리
+
+groups 기능을 사용해서 등록과 수정 시에 각각 다르게 검증할 수 있게되었다.
+그런데, 코드를 보면 알겠지만, 작성해야되는 코드가 너무 많고 중복이 너무 많아졌다.
+사실 groups 기능은 잘 사용되지 않는데, 그 이유는 위의 방법보다 그냥 등록용 객체와 수정용 객체를 따로 만들어서 관리하기 때문이다.
+
 ## Form 전송 객체 분리 - 프로젝트 준비 V4
 
 ## Form 전송 객체 분리 - 소개

@@ -2,6 +2,8 @@ package hello.springcoremvc22.web.validation.v3;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
+import hello.springcoremvc22.domain.validation.SaveCheck;
+import hello.springcoremvc22.domain.validation.UpdateCheck;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -45,7 +47,7 @@ public class ValidationItemControllerV3 {
 
     @PostMapping("/add")
     public String addItem(
-            @Validated @ModelAttribute Item item,
+            @Validated(SaveCheck.class) @ModelAttribute Item item,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
@@ -82,7 +84,7 @@ public class ValidationItemControllerV3 {
     @PostMapping("/{itemId}/edit")
     public String edit(
             @PathVariable long itemId,
-            @Validated @ModelAttribute Item item,
+            @Validated(UpdateCheck.class) @ModelAttribute Item item,
             BindingResult bindingResult
     ) {
         // 특정 필드가 아닌 복합 룰 검증
