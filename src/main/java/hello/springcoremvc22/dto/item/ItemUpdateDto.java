@@ -1,5 +1,6 @@
 package hello.springcoremvc22.dto.item;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ public class ItemUpdateDto {
     @NotNull
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String itemName;
 
     @NotNull

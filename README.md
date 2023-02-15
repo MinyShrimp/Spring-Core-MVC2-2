@@ -6,6 +6,7 @@
 * 깃헙
     * https://github.com/MinyShrimp/Spring-Core-MVC2-1
     * https://github.com/MinyShrimp/Spring-Core-MVC2-2
+    * https://github.com/MinyShrimp/Spring-Core-MVC2-6
 
 ## [타임리프 - 스프링 통합과 폼](./강의/2강)
 
