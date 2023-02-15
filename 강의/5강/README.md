@@ -143,6 +143,36 @@ BeanValidator는 바인딩에 실패한 필드는 BeanValidation을 적용하지
 
 ## 에러 코드
 
+### NotBlank
+
+* NotBlank.item.itemName
+* NotBlank.itemName
+* NotBlank.java.lang.String
+* NotBlank
+
+### Range
+
+* Range.item.price
+* Range.price
+* Range.java.lang.Integer
+* Range
+
+### errors.properties
+
+```properties
+# == Bean Validation ==
+NotNull                        = {0}, 값을 입력해야 합니다.
+NotBlank                       = {0} 공백 X
+Range                          = {0}, {2} ~ {1} 허용
+Max                            = {0}, 최대 
+```
+
+### Bean Validation 메시지 찾는 순서
+
+1. 생성된 메시지 코드 순서대로 messageSource에서 메시지 찾기
+2. 애노테이션의 message 속성 사용
+3. 라이브러리가 제공하는 기본 값 사용
+
 ## 오브젝트 오류
 
 ## 수정에 적용
