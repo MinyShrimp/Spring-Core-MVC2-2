@@ -175,6 +175,55 @@ Max                            = {0}, 최대
 
 ## 오브젝트 오류
 
+### ScriptAssert
+
+```java
+@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000")
+public class Item {
+}
+```
+
+#### 메시지 코드
+
+* ScriptAssert.item
+* ScriptAssert
+
+> 주의! <br>
+> 위 코드는 JDK 11 버전에서만 가능하다.
+> 즉, 17 버전을 사용하는 Spring boot 3.0 이상은 사용할 수 없다.
+
+### ValidationItemController V3
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @Validated @ModelAttribute Item item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        return "validation/v3/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v3/items/{itemId}";
+}
+```
+
+ScriptAssert는 제약이 많고 복잡하여, 오브젝트 오류의 경우 저번 시간에 했던 방식으로 직접 작성하는 것을 권장한다.
+
 ## 수정에 적용
 
 ## 한계
