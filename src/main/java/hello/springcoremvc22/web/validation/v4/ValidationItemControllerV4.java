@@ -85,6 +85,7 @@ public class ValidationItemControllerV4 {
 
     @PostMapping("/{itemId}/edit")
     public String edit(
+            @PathVariable Long itemId,
             @Validated @ModelAttribute("item") ItemUpdateDto item,
             BindingResult bindingResult
     ) {
