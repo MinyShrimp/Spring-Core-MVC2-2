@@ -2,6 +2,8 @@ package hello.springcoremvc22.web.validation.v4;
 
 import hello.springcoremvc22.domain.validation.Item;
 import hello.springcoremvc22.domain.validation.ItemRepository;
+import hello.springcoremvc22.dto.item.ItemSaveDto;
+import hello.springcoremvc22.dto.item.ItemUpdateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -45,7 +47,7 @@ public class ValidationItemControllerV4 {
 
     @PostMapping("/add")
     public String addItem(
-            @Validated @ModelAttribute Item item,
+            @Validated @ModelAttribute("item") ItemSaveDto item,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
@@ -63,7 +65,9 @@ public class ValidationItemControllerV4 {
         }
 
         // 성공 로직
-        Item savedItem = itemRepository.save(item);
+        Item savedItem = itemRepository.save(new Item(
+                item.getItemName(), item.getPrice(), item.getQuantity()
+        ));
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v4/items/{itemId}";
@@ -81,8 +85,7 @@ public class ValidationItemControllerV4 {
 
     @PostMapping("/{itemId}/edit")
     public String edit(
-            @PathVariable long itemId,
-            @Validated @ModelAttribute Item item,
+            @Validated @ModelAttribute("item") ItemUpdateDto item,
             BindingResult bindingResult
     ) {
         // 특정 필드가 아닌 복합 룰 검증
@@ -99,7 +102,9 @@ public class ValidationItemControllerV4 {
         }
 
         // 성공 로직
-        itemRepository.update(itemId, item);
+        itemRepository.update(item.getId(), new Item(
+                item.getItemName(), item.getPrice(), item.getQuantity()
+        ));
         return "redirect:/validation/v4/items/{itemId}";
     }
 }

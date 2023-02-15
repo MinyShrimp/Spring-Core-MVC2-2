@@ -466,4 +466,124 @@ Item 도메인 객체를 폼 전달 데이터로 사용하고, 그대로 쭉 넘
 
 ## Form 전송 객체 분리 - 개발
 
+### Item 원복
+
+```java
+@Getter @Setter
+public class Item {
+    private Long id;
+    private String itemName;
+    private Integer price;
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+
+### ItemSaveDto
+
+```java
+@Setter @Getter
+public class ItemSaveDto {
+    @NotNull
+    private String itemName;
+
+    @NotNull
+    @Range(min = 1000, max = 1000000)
+    private Integer price;
+
+    @NotNull
+    @Max(value = 9999)
+    private Integer quantity;
+}
+```
+
+### ItemUpdateDto
+
+```java
+@Getter @Setter
+public class ItemUpdateDto {
+    @NotNull
+    private Long id;
+
+    @NotNull
+    private String itemName;
+
+    @NotNull
+    @Range(min = 1000, max = 1000000)
+    private Integer price;
+
+    private Integer quantity;
+}
+```
+
+### ValidationItemController V4
+
+```java
+@PostMapping("/add")
+public String addItem(
+        @Validated @ModelAttribute("item") ItemSaveDto item,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
+) {
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        return "validation/v4/addForm";
+    }
+
+    // 성공 로직
+    Item savedItem = itemRepository.save(new Item(
+            item.getItemName(), item.getPrice(), item.getQuantity()
+    ));
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v4/items/{itemId}";
+}
+
+@PostMapping("/{itemId}/edit")
+public String edit(
+        @Validated @ModelAttribute("item") ItemUpdateDto item,
+        BindingResult bindingResult
+) {
+    // 특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    // 검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+        return "validation/v4/editForm";
+    }
+
+    // 성공 로직
+    itemRepository.update(item.getId(), new Item(
+            item.getItemName(), item.getPrice(), item.getQuantity()
+    ));
+    return "redirect:/validation/v4/items/{itemId}";
+}
+```
+
+> **주의!** <br>
+> `@ModelAttribute("item")`에 item 이름을 넣어준 부분을 주의하자.
+> 이것을 넣지않으면, `ItemSaveForm`의 경우 규칙에 의해 `itemSaveForm`이라는 이름으로 MVC Model에 담기게 된다.
+> 이렇게 되면, 뷰 템플릿에서 접근하는 `th:object`이름도 함께 변경해주어야 한다.
+
 ## HTTP 메시지 컨버터
