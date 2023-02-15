@@ -295,6 +295,48 @@ public String edit(
 
 ## 한계
 
+### 수정시 요구사항
+
+* 등록 시에는 수량을 최대 9999까지 등록할 수 있지만, 수정 시에는 수량을 무제한으로 변경할 수 있다.
+* 등록 시에는 id에 값이 없어도 되지만, 수정 시에는 id 값이 필수이다.
+
+### 적용 - Item
+
+```java
+@Getter
+@Setter
+@ToString
+public class Item {
+    @NotNull // 수정 요구사항 추가
+    private Long id;
+
+    @NotBlank
+    private String itemName;
+
+    @NotNull
+    @Range(min = 1000, max = 100000)
+    private Integer price;
+
+    @NotNull
+//    @Max(9999) // 수정 요구사항 추가
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+
+### 문제
+
+수정은 됐다.
+그런데 이러면 등록도 같이 적용이 되어 문제가 생긴다.
+
 ## groups
 
 ## Form 전송 객체 분리 - 프로젝트 준비 V4

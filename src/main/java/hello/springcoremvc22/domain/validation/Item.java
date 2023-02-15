@@ -1,6 +1,5 @@
 package hello.springcoremvc22.domain.validation;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,6 +11,7 @@ import org.hibernate.validator.constraints.Range;
 @Setter
 @ToString
 public class Item {
+    @NotNull // 수정 요구사항 추가
     private Long id;
 
     @NotBlank
@@ -22,7 +22,7 @@ public class Item {
     private Integer price;
 
     @NotNull
-    @Max(9999)
+//    @Max(9999) // 수정 요구사항 추가
     private Integer quantity;
 
     public Item() {
